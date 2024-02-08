@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Mix;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,5 +15,18 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('welcome', [
+        'mixes' => Mix::query()->published()->orderByDesc('published_at')->get(),
+    ]);
 });
+
+Route::get('mix/{mix}', function (Mix $mix) {
+    if (!$mix->isPublished()) {
+        abort(404);
+    }
+
+    return view('mixes.show', [
+        'mix' => $mix
+    ]);
+})
+    ->name('mixes.show');
